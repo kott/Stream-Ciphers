@@ -1,14 +1,10 @@
 package A51;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import javax.imageio.ImageIO;
 
 /**
  *	This class is used for the operations associated with 
@@ -19,7 +15,6 @@ import javax.imageio.ImageIO;
 public class DataFileHandler {
 	
 	private String fileName;
-	private BufferedImage img = null;
 	
 	/**
 	 * Initialise the class with the path to the image file
@@ -46,10 +41,10 @@ public class DataFileHandler {
 	public String getFileExtension() {
 		String ext = "";
 		String[] fileChunks = this.fileName.split("[.]");
-		System.out.println(fileChunks.length);
-		if(fileChunks.length > 0)
-			ext = fileChunks[fileChunks.length - 1];
 		
+		if(fileChunks.length > 0) {
+			ext = fileChunks[fileChunks.length - 1];
+		}
 		return ext;
 	}
 	
