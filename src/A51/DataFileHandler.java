@@ -26,11 +26,29 @@ public class DataFileHandler {
 	}
 	
 	/**
+	 * Gets the size of the file.
+	 * @return
+	 */
+	public long getFileSize() {
+		File file = new File(this.fileName);
+		return file.length();
+	}
+	
+	/**
 	 * Getter for the file name
 	 * @return
 	 */
 	public String getFileName() {
 		return this.fileName;
+	}
+	
+	/**
+	 * Setter for the file name
+	 * @return
+	 */
+	public void setFileName(String fileNameNew) {
+		this.fileName = fileNameNew;
+		return;
 	}
 	
 	/**
@@ -44,6 +62,23 @@ public class DataFileHandler {
 		
 		if(fileChunks.length > 0) {
 			ext = fileChunks[fileChunks.length - 1];
+		}
+		return ext;
+	}
+	
+	/**
+	 * Gets the filename and full path to the file
+	 * without the extension.
+	 * @return
+	 */
+	public String getFileWithoutExtension() {
+		String ext = "";
+		String[] fileChunks = this.fileName.split("[.]");
+		
+		if(fileChunks.length > 1) {
+			ext = "";
+			for(int i = 0; i < fileChunks.length - 1; i++)
+				ext += fileChunks[i];
 		}
 		return ext;
 	}
@@ -77,10 +112,10 @@ public class DataFileHandler {
 		byte[] buffer = new byte[frameLength];
 		
 		try  {
-			//Open the input and out files for the stream 
-			fileInput = new FileInputStream(this.fileName); 
-			fileInput.read(buffer, frame * frameLength, frameLength);
-			
+			//Open the input for the stream 
+			fileInput = new FileInputStream(new File(this.fileName)); 
+			fileInput.skip(frame * frameLength);
+			fileInput.read(buffer, 0, frameLength);
 		} 
 		catch (IOException e) { 
 			//Catch the IO error and print out the message 
@@ -101,10 +136,10 @@ public class DataFileHandler {
 	 * @param fileName
 	 * @throws IOException
 	 */
-	public void writeFileBytes(byte[] imageData, String fileName) throws IOException {
+	public void writeFileBytes(byte[] fData, String fileName, int length) throws IOException {
 		File outFile = new File(fileName);
 		FileOutputStream output = new FileOutputStream(outFile, true);
-		output.write(imageData);
+		output.write(fData, 0, length);
 		output.close();
 	}
 

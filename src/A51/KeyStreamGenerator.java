@@ -1,6 +1,5 @@
 package A51;
 
-import java.io.IOException;
 import java.math.BigInteger;
 
 /**
@@ -54,10 +53,9 @@ public class KeyStreamGenerator {
 		mixFrameNumber();
 		
 		//initialise the LFSR for 100 cycles
-		for(int i = 0; i < 100; i++)
+		for(int i = 0; i < 100; i++) {
 			regularCycle();
-		
-		printRegisters(); //show the registers
+		}
 	}
 	
 	/**
@@ -66,6 +64,18 @@ public class KeyStreamGenerator {
 	public void incrementFrameNumber() {
 		this.frameNumber++;
 		return;
+	}
+	
+	public int getFrameNumber() {
+		return this.frameNumber;
+	} 
+	
+	public int getOrigFrameNumber() {
+		return this.origFrameNumber;
+	}
+	
+	public void resetFrameNumber() {
+		this.frameNumber = this.origFrameNumber;
 	}
 	
 	/**
@@ -85,7 +95,7 @@ public class KeyStreamGenerator {
 				sb.append(regOut); //convert the bit to string representation
 				regularCycle(); // Send a clock pulse
 			}
-			streamFrame[i] = Byte.parseByte(sb.toString(), 2);
+			streamFrame[i] = (byte) Integer.parseInt(sb.toString(), 2);
 		}
 		return streamFrame;
 	}
@@ -109,15 +119,6 @@ public class KeyStreamGenerator {
 			result = (byte) ((lsbKey + r3[0]) % 2); // modulo 2 arithmetic with bit in LSB of R3
 			shiftRegister(3, result);
 			count++;
-			
-//			try {
-//				printRegisters();
-//				Thread.sleep(500);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-			
 		}
 	}
 	
@@ -294,6 +295,4 @@ public class KeyStreamGenerator {
 		}
 		System.out.println();
 	}
-	
-	
 }
