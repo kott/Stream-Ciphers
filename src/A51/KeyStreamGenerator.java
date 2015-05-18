@@ -17,11 +17,13 @@ public class KeyStreamGenerator {
 	private int origFrameNumber; //keep the original frame number
 	
 	//Shift registers originally initialised with 0's 
+	//They should be though of as LSB --> MSB. This being array[0]
+	//is the LSB of the register.
 	private byte[] r1 = new byte[19]; 
 	private byte[] r2 = new byte[22];
 	private byte[] r3 = new byte[23];
 	
-	private static final byte[] R1TAPS = {18, 17, 16, 13}; //LSB --> MSB 
+	private static final byte[] R1TAPS = {18, 17, 16, 13}; //LSB --> MSB
 	private static final byte[] R2TAPS = {21, 20}; 		   //LSB --> MSB 
 	private static final byte[] R3TAPS = {22, 21, 20, 7};  //LSB --> MSB 
 	

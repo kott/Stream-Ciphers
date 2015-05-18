@@ -154,12 +154,16 @@ public class A51 {
 			inputFile = args[0];
 			key = padZeros(args[1], 16);
 			frameNumber = padZeros(args[2], 8);
+			
+			System.out.println("Key: " + key + 
+					"\nFrame Number: " + frameNumber + "\n");
 		}
 		return;
 	}
 	
 	/**
-	 * Adds zeros to the MSB of the given string.
+	 * Adds zeros to the MSB of the given string. If the string is
+	 * too large, it will be truncated.
 	 * @param inString
 	 * @param bytes
 	 * @return
@@ -167,17 +171,23 @@ public class A51 {
 	private static String padZeros(String inString, int bytes) {
 		char[] initS = new char[bytes];
 		char[] inArray = inString.toCharArray();
-
-		for(int i = 0; i < bytes; i++) initS[i] = '0';
 		
+		if(inString.length() > bytes) {
+			int start = inString.length() - bytes;
+			System.arraycopy(inArray, start, initS, 0, initS.length);
+		}
+		else {
+			int diff = bytes - inString.length();
+			
+			for(int i = 0; i < bytes; i++) initS[i] = '0';
+			System.arraycopy(inArray, 0, initS, diff, inArray.length);
+		}
 		return new String(initS);
 	}
 	
 	public static void main(String[] args) throws IOException{
 		
 		validateInput(args);
-		
-		System.out.println(padZeros(args[1], 16));
 		
 		String encryptedFile = encrypt(inputFile, key, frameNumber);
 		String decryptedFile = decrypt(encryptedFile, key, frameNumber);
