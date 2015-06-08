@@ -12,10 +12,11 @@ import java.io.IOException;
  */
 public class A51 {
 	
-	private static final int FRAMELENGTH = 57; //frames have 228 bits (57 bytes)
 	private static String inputFile = null;
 	private static String key = null;
 	private static String frameNumber = null;
+	private static final int BUFFERSIZE = 64;
+	
 	
 	/**
 	 * 
@@ -31,36 +32,34 @@ public class A51 {
 		KeyStreamGenerator keyStreamGenerator = new KeyStreamGenerator(encryptKey, encryptFrameNumber);
 		
 		long fSize = dataHandler.getFileSize();
-		byte[] fileChunk = new byte[FRAMELENGTH];
-		byte[] encryptedFrame = new byte[FRAMELENGTH];
-		byte[] keyStreamFrame; 
-		int frame;
-		int bytesToWrite = FRAMELENGTH;
+		byte fileChunk;
+		byte[] encryptedBytes = new byte[BUFFERSIZE];
+		byte keyStreamByte; 
 		
 		String outFile = dataHandler.getFileWithoutExtension() + 
-						"(encrypted)." + dataHandler.getFileExtension();
+						"[encrypted]." + dataHandler.getFileExtension();
 		
 		System.out.println("Encrypting: " + dataHandler.getFileName() + " --> " + outFile);
-
-		for(long currByte = 0; currByte < fSize + FRAMELENGTH; currByte += FRAMELENGTH) {
+		
+		keyStreamGenerator.init(); //initialization phase for the key stream
+		
+		for(long currByte = 0; currByte < fSize; currByte++) {
 			//calculate the current frame
-			frame = keyStreamGenerator.getFrameNumber() - keyStreamGenerator.getOrigFrameNumber();
-			keyStreamGenerator.init(); //initialization phase for the key stream
-			
 			try {
-				fileChunk = dataHandler.readFileBytes(FRAMELENGTH, frame);
-				keyStreamFrame = keyStreamGenerator.getStreamFrame();
-				keyStreamGenerator.incrementFrameNumber(); //for each frame we need to increment the frame number
+				fileChunk = dataHandler.readFileByte((int)currByte);
+				keyStreamByte = keyStreamGenerator.getStreamByte();
+				// XOR with Plain text and key stream --> cipher text 
+				encryptedBytes[(int) (currByte % BUFFERSIZE)] = (byte) (keyStreamByte ^ fileChunk);
 				
-				for(int pos = 0; pos < FRAMELENGTH; pos++) {
-					// XOR with Plain text and key stream --> cipher text 
-					encryptedFrame[pos] = (byte) (keyStreamFrame[pos] ^ fileChunk[pos]);
-					if(currByte + pos > fSize) { //a check to make sure we don't change the size of the file
-						bytesToWrite = pos;
-						break;
-					}
+				if((currByte + 1) % BUFFERSIZE == 0) { //check if the buffer should be written
+					dataHandler.writeFileBytes(encryptedBytes, outFile, BUFFERSIZE);
 				}
-				dataHandler.writeFileBytes(encryptedFrame, outFile, bytesToWrite);
+				
+				//if the loop will end in the next iteration, write the rest of the buffer
+				else if(currByte == fSize - 1) { 
+					dataHandler.writeFileBytes(encryptedBytes, outFile, (int)(currByte % BUFFERSIZE) + 1);
+				}
+				
 			}
 			catch(Exception ex) {
 				ex.printStackTrace();
@@ -78,53 +77,42 @@ public class A51 {
 	 */
 	public static String decrypt(String fileToDecrypt, String decryptKey, String decryptFrameNumber) {
 		
+		//Create new file handler and key stream handler for encryption
 		DataFileHandler dataHandler = new DataFileHandler(fileToDecrypt);
 		KeyStreamGenerator keyStreamGenerator = new KeyStreamGenerator(decryptKey, decryptFrameNumber);
 		
 		long fSize = dataHandler.getFileSize();
-		byte[] fileChunk = new byte[FRAMELENGTH];
-		byte[] decryptedFrame = new byte[FRAMELENGTH];
-		byte[] keyStreamFrame; 
-		int frame;
-		int bytesToWrite = FRAMELENGTH;
+		byte fileChunk;
+		byte[] decryptedBytes = new byte[BUFFERSIZE];
+		byte keyStreamByte; 
 		
-		String outFile = dataHandler.getFileWithoutExtension() + "(decrypted)." + dataHandler.getFileExtension();
+		String outFile = dataHandler.getFileWithoutExtension() + "[decrypted]." + dataHandler.getFileExtension();
 		System.out.println("Decrypting: " + dataHandler.getFileName() + " --> " + outFile);
-
 		
-		for(long currByte = 0; currByte < fSize + FRAMELENGTH; currByte += FRAMELENGTH) {
+		keyStreamGenerator.init(); //initialization phase for the key stream
+		
+		for(long currByte = 0; currByte < fSize; currByte ++) {
 			//calculate the current frame
-			frame = keyStreamGenerator.getFrameNumber() - keyStreamGenerator.getOrigFrameNumber();
-			keyStreamGenerator.init(); // initialization phase for key stream
-			
 			try {
-				fileChunk = dataHandler.readFileBytes(FRAMELENGTH, frame);
-				keyStreamFrame = keyStreamGenerator.getStreamFrame();
-				keyStreamGenerator.incrementFrameNumber();
+				fileChunk = dataHandler.readFileByte((int)currByte);
+				keyStreamByte = keyStreamGenerator.getStreamByte();
+				// XOR with cipher text and key stream --> plain text
+				decryptedBytes[(int) (currByte % BUFFERSIZE)] = (byte) (keyStreamByte ^ fileChunk);
 				
-				for(int pos = 0; pos < FRAMELENGTH; pos++) {
-					// XOR with cipher text and key stream --> plain text 
-					decryptedFrame[pos] = (byte) (keyStreamFrame[pos] ^ fileChunk[pos]);
-					if(currByte + pos > fSize) {
-						bytesToWrite = pos;
-						break;
-					}
+				if((currByte + 1) % BUFFERSIZE == 0) {
+					dataHandler.writeFileBytes(decryptedBytes, outFile, BUFFERSIZE);
 				}
-				dataHandler.writeFileBytes(decryptedFrame, outFile, bytesToWrite);
+				
+				//if the loop will end in the next iteration, write the rest of the buffer
+				else if(currByte - 1 == fSize) {
+					dataHandler.writeFileBytes(decryptedBytes, outFile, (int)(currByte % BUFFERSIZE) + 1);
+				}
 			}
 			catch(Exception ex) {
 				ex.printStackTrace();
 			}
 		}
 		return outFile;
-	}
-	
-	public static void printFrame(byte[] frame) {
-		System.out.println();
-		for(byte b : frame) {
-			System.out.print("" + b);
-		}
-		System.out.println();
 	}
 
 	/**
@@ -185,6 +173,16 @@ public class A51 {
 		return new String(initS);
 	}
 	
+	/**
+	 * Entry point to the system.
+	 * 3 Input arguments:
+	 * args[0]: /path/to/file.ext
+	 * args[1]: key
+	 * args[2]: frame number
+	 * 
+	 * @param args
+	 * @throws IOException
+	 */
 	public static void main(String[] args) throws IOException{
 		
 		validateInput(args);

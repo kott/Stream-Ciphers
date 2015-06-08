@@ -102,6 +102,8 @@ public class DataFileHandler {
 	 * This method reads in the image data from a given frame and returns
 	 * an array of bytes(with the same length as our frame size).
 	 * 
+	 * NOTE: NO LONGER USED!!!
+	 * 
 	 * @param frameLength
 	 * @param frame
 	 * @return
@@ -128,6 +130,39 @@ public class DataFileHandler {
 			}
 		}
 		return buffer;
+	}
+	
+	
+	/**
+	 * This method reads in the image data from a given offset 
+	 * and returns the byte at the given offset
+	 * 
+	 * @param frameLength
+	 * @param frame
+	 * @return
+	 * @throws IOException
+	 */
+	public byte readFileByte(int offset) throws IOException {
+		FileInputStream fileInput = null; 
+		byte[] buffer = new byte[1];
+		
+		try  {
+			//Open the input for the stream 
+			fileInput = new FileInputStream(new File(this.fileName)); 
+			fileInput.skip(offset);
+			fileInput.read(buffer, 0, 1);
+		} 
+		catch (IOException e) { 
+			//Catch the IO error and print out the message 
+			System.err.println(e.getMessage()); 
+		}  
+		finally  { 
+			//close stream 
+			if (fileInput != null) { 
+				fileInput.close(); 
+			}
+		}
+		return buffer[0];
 	}
 	
 	/**
