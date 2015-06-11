@@ -12,8 +12,8 @@ public class KeyStreamGenerator {
 	private static final int FRAMENUMBERLENGTH = 22;
 	private static final int FRAMELENGTH = 228; //frames have 228 bits
 	
-	private long key; //64-bit key
-	private int frameNumber; //22-bit frame number
+	private long key; 			 //64-bit key
+	private int frameNumber;     //22-bit frame number
 	private int origFrameNumber; //keep the original frame number
 	
 	//Shift registers originally initialised with 0's 
@@ -83,28 +83,6 @@ public class KeyStreamGenerator {
 	
 	public void resetFrameNumber() {
 		this.frameNumber = this.origFrameNumber;
-	}
-	
-	/**
-	 * This method generates a single key stream Frame. This should only
-	 * be called once the initialisation phase has finished.
-	 *   
-	 * @return The stream frame contains the 57 bytes given by the LFSRs 
-	 */
-	public byte[] getStreamFrame() {
-		byte[] streamFrame = new byte[FRAMELENGTH];
-		StringBuilder sb;
-		
-		for(int i = 0; i < FRAMELENGTH; i++) {
-			sb = new StringBuilder();
-			for(int j = 0; j < 8; j++) { //get 8 bits from the LFSR in order to create a byte value
-				byte regOut = (byte) ((r1[18] + r2[21] + r3[22]) % 2); //get the bit value of the LFSR
-				sb.append(regOut); //convert the bit to string representation
-				regularCycle(); // Send a clock pulse
-			}
-			streamFrame[i] = (byte) Integer.parseInt(sb.toString(), 2);
-		}
-		return streamFrame;
 	}
 	
 	/**

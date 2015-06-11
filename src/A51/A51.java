@@ -59,7 +59,6 @@ public class A51 {
 				else if(currByte == fSize - 1) { 
 					dataHandler.writeFileBytes(encryptedBytes, outFile, (int)(currByte % BUFFERSIZE) + 1);
 				}
-				
 			}
 			catch(Exception ex) {
 				ex.printStackTrace();
