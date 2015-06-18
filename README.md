@@ -14,15 +14,13 @@ The main file is A51.java, which accepts 3 command line arguments:
 
 ### Compiling and Running
 1. Navigate to the same directory as this file. There should be a bin/ directory and a src/ directory
-2. Compile with the following command: javac -d ./bin ./src/*.java
-3. Run the program with the following command (and appropriate input arguments): 
-java -classpath ./bin A51.A51 
+2. Compile with the following command: ``` javac -d ./bin ./src/*.java ```
+3. Run the program with the following command (and appropriate input arguments): ``` java -classpath ./bin A51.A51 ```
 
 ### Running the Executable
 1. Navigate to the runnable/ directory.
-2. Enter the following command to run the .jar file (with proper input arguments):
-java -jar A51.jar
-3. Example: java -jar A51.jar test_image.jpg FEDCBA9876543210 C45AF
+2. Enter the following command to run the .jar file (with proper input arguments): ``` java -jar A51.jar ```
+3. Example: ``` java -jar A51.jar test_image.jpg FEDCBA9876543210 C45AF ```
 
 ## Expected Output
 The program will produce two files. One file be the encrypted file written to
