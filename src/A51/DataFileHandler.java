@@ -11,6 +11,7 @@ import java.io.IOException;
  *	the management of a given file. i.e. Read, Write, 
  *	Get file name, etc.
  *
+ *  @author Kristian Ott
  */
 public class DataFileHandler {
 	

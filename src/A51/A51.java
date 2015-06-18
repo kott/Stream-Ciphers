@@ -9,6 +9,7 @@ import java.io.IOException;
  * number (Hex), encryption and decryption functions can be
  * performed on the file using the A5/1 stream cipher algorithm. 
  *
+ * @author Kristian Ott
  */
 public class A51 {
 	

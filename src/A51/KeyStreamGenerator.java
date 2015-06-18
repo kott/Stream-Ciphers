@@ -6,6 +6,7 @@ import java.math.BigInteger;
  * This Class generates the key stream for A5/1. The Stream is generated
  * based on the given key and frame number given to LFSR  
  *
+ * @author Kristian Ott
  */
 public class KeyStreamGenerator {
 	private static final int KEYLENGTH = 64;
